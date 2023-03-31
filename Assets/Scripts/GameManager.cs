@@ -1,21 +1,35 @@
-using JetBrains.Annotations;
-using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-   private static GameManager instance;
-
+    private static GameManager instance;
     public static GameManager Instance { get; private set; }
 
-    public int pgaeCounter = 0;
-    public GameObject[] spawnLocations = new GameObject[15];
-    public int currentSpawnIndex = Random.Range(0, 15);
+    public bool pageCollected;
+    public bool gameOver;
+    public int pageCounter;
 
-    public GameObject PagePrefab;
+    int lastPage = 8;
 
-    private void Awake()
+    [SerializeField]
+    GameObject PagePrefab;
+
+    [SerializeField]
+    int spawnLocationsCount;
+
+    [SerializeField]
+    GameObject[] spawnLocations;
+
+    [SerializeField]
+    TextMeshProUGUI pagesCollectedText;
+
+    int currentSpawnIndex;
+    GameObject currentPage;
+
+    
+
+   void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -24,6 +38,45 @@ public class GameManager : MonoBehaviour
         else
         {
             Instance = this;
+        }
+    }
+
+    void Start()
+    {
+        gameOver = false;
+        pageCounter = 0;
+        pageCollected = false;
+        currentSpawnIndex = 0;
+
+        // Spawn the first Page
+        SpawnPage();
+
+        SetText();
+
+    }
+
+    void Update()
+    {  
+        if (gameOver)
+        {
+            EndGame();
+        }
+
+        if (pageCollected)
+        {            
+            pageCounter += 1;
+
+            if (pageCounter == lastPage)
+            {
+                gameOver = true;
+                return;
+            }    
+
+            DestroyCurrentPage();
+            SpawnPage();                       
+            SetText();
+
+            pageCollected = false;                                    
         }
     }
 
@@ -38,15 +91,35 @@ public class GameManager : MonoBehaviour
         return index;
     }
 
+    void DestroyCurrentPage()
+    {
+        if (currentPage == null)
+            return;
+
+        Destroy(currentPage);
+        currentPage = null;
+    }
+
     void SpawnPage()
     {
        currentSpawnIndex = ChooseSpawnLocation();
 
-       if (currentSpawnIndex > spawnLocations.Length || currentSpawnIndex < 0)
+       if (currentSpawnIndex >= spawnLocations.Length || currentSpawnIndex < 0)
        {
-            return;
+            currentSpawnIndex = 0;
        }
 
-        Instantiate(PagePrefab, spawnLocations[currentSpawnIndex].transform);
+        currentPage = Instantiate(PagePrefab, spawnLocations[currentSpawnIndex].transform);
+    }
+
+    void SetText()
+    {
+        pagesCollectedText.text = "Pages Collected: " + pageCounter;
+    }
+
+    void EndGame()
+    {
+        // add end game logic
+        return;
     }
 }
