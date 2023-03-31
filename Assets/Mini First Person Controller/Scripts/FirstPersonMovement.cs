@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class FirstPersonMovement : MonoBehaviour
@@ -16,11 +17,24 @@ public class FirstPersonMovement : MonoBehaviour
     public List<System.Func<float>> speedOverrides = new List<System.Func<float>>();
 
 
+    int cooldown = 2;
+    bool keyPressed = false;
 
     void Awake()
-    {
+    {        
         // Get the rigidbody on this.
         rigidbody = GetComponent<Rigidbody>();
+    }
+
+    private void Update()
+    {
+        if (Input.GetKey(KeyCode.E) && !keyPressed)
+        {
+            GameManager.Instance.pageCollected = true;
+
+            // using a coroutine to handle throtlling
+            StartCoroutine(KeyPressCooldown());
+        }
     }
 
     void FixedUpdate()
@@ -40,5 +54,12 @@ public class FirstPersonMovement : MonoBehaviour
 
         // Apply movement.
         rigidbody.velocity = transform.rotation * new Vector3(targetVelocity.x, rigidbody.velocity.y, targetVelocity.y);
+    }
+
+    IEnumerator KeyPressCooldown() 
+    {
+        keyPressed = true;
+        yield return new WaitForSeconds(cooldown);
+        keyPressed = false;
     }
 }
