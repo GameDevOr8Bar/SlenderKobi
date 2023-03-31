@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     public bool pageCollected;
+    public bool lastPageCollected;
     public bool gameOver;
     public int pageCounter;
 
@@ -42,7 +43,8 @@ public class GameManager : MonoBehaviour
     }
 
     void Start()
-    {
+    {   
+        lastPageCollected = false;
         gameOver = false;
         pageCounter = 0;
         pageCollected = false;
@@ -68,7 +70,7 @@ public class GameManager : MonoBehaviour
 
             if (pageCounter == lastPage)
             {
-                gameOver = true;
+                lastPageCollected = true;
                 return;
             }    
 
