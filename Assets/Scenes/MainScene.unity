@@ -172,15 +172,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pageCollected: 0
+  lastPageCollected: 0
   gameOver: 0
+  pageCollision: 0
   pageCounter: 0
-  PagePrefab: {fileID: 1593668004480491375, guid: 1e6a61856308db74c90b2d8d2ec9f771, type: 3}
+  PagePrefab: {fileID: 6685215571379215962, guid: 64a5da317d5993b4e82987f4a4e68c02, type: 3}
   spawnLocationsCount: 0
   spawnLocations:
   - {fileID: 265552459}
   - {fileID: 2144439074}
   - {fileID: 1010187507}
   pagesCollectedText: {fileID: 886263003}
+  pagesMeshes:
+  - {fileID: 5302568919011541938, guid: 9a63aa58916daa04690ec94ab82582dc, type: 3}
+  - {fileID: 3369316746193770658, guid: 9a63aa58916daa04690ec94ab82582dc, type: 3}
+  - {fileID: 3861478300804232965, guid: 9a63aa58916daa04690ec94ab82582dc, type: 3}
+  - {fileID: -3758573805739257388, guid: 9a63aa58916daa04690ec94ab82582dc, type: 3}
+  - {fileID: 6606501483488557099, guid: 9a63aa58916daa04690ec94ab82582dc, type: 3}
+  - {fileID: -7759331768739107841, guid: 9a63aa58916daa04690ec94ab82582dc, type: 3}
+  - {fileID: 6788383922943872000, guid: 9a63aa58916daa04690ec94ab82582dc, type: 3}
+  - {fileID: 7857590630482128698, guid: 9a63aa58916daa04690ec94ab82582dc, type: 3}
 --- !u!4 &191128024
 Transform:
   m_ObjectHideFlags: 0
@@ -206,7 +217,7 @@ GameObject:
   m_Component:
   - component: {fileID: 265552460}
   m_Layer: 0
-  m_Name: A
+  m_Name: Spawn 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -220,7 +231,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 265552459}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 14.248, y: 1.481, z: 9.64}
+  m_LocalPosition: {x: 13.958, y: 1.481, z: 10.167}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -487,7 +498,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -79.27527, w: 0}
+  m_margin: {x: 0, y: 0, z: -190.90924, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -511,7 +522,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1010187508}
   m_Layer: 0
-  m_Name: A (2)
+  m_Name: Spawn 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -712,6 +723,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: First Person Controller
       objectReference: {fileID: 0}
+    - target: {fileID: 1773623360729482, guid: 11aaea5348574644a9eb4f4504fcce3f, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
     - target: {fileID: 4207293392497186, guid: 11aaea5348574644a9eb4f4504fcce3f, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -792,7 +807,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2144439075}
   m_Layer: 0
-  m_Name: A (1)
+  m_Name: Spawn 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
