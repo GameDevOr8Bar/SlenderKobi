@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     public bool pageCollision;
     public int pageCounter;
 
-    int lastPage = 3;
+    int lastPage = 8;
 
     [SerializeField]
     GameObject PagePrefab;

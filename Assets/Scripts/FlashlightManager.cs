@@ -93,6 +93,7 @@ public class FlashlightManager : MonoBehaviour
         //      Time passed from start of game: the longer the game has played, the more likely the flicker to occur (logarithmic)
         //      Is the player near an enemy: when the player is near an enemy, increases the flicker chance by a large amount
         //      How many pages have been collected: each page increases flicker probability by a small amount
+        pagesCollected = GameManager.Instance.pageCounter;
         flickeringProbability = FlickeringProbability(gameTimePassedInSeconds, pagesCollected, nearEnemy);
         // Update flickering max duration. Affected by the same variables as the probability.
         flickeringTime = FlickeringDuration(gameTimePassedInSeconds, nearEnemy);

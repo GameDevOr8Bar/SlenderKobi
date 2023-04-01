@@ -55,7 +55,7 @@ public class FirstPersonMovement : MonoBehaviour
         // if the key is pressed, thortlling is over, 
         // and player collided with the page, then collect page
         if (!keyPressed
-            && Input.GetKey(KeyCode.E)
+            && Input.GetMouseButtonDown(0)
             && GameManager.Instance.pageCollision)
         {
 
