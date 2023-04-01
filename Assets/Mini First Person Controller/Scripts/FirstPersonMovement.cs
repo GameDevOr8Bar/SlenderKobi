@@ -27,14 +27,8 @@ public class FirstPersonMovement : MonoBehaviour
     }
 
     private void Update()
-    {
-        if (Input.GetKey(KeyCode.E) && !keyPressed)
-        {
-            GameManager.Instance.pageCollected = true;
-
-            // using a coroutine to handle throtlling
-            StartCoroutine(KeyPressCooldown());
-        }
+    {   
+        HandlePageCollection();
     }
 
     void FixedUpdate()
@@ -54,6 +48,26 @@ public class FirstPersonMovement : MonoBehaviour
 
         // Apply movement.
         rigidbody.velocity = transform.rotation * new Vector3(targetVelocity.x, rigidbody.velocity.y, targetVelocity.y);
+    }
+
+    void HandlePageCollection()
+    {
+        // if the key is pressed, thortlling is over, 
+        // and player collided with the page, then collect page
+        if (!keyPressed
+            && Input.GetMouseButtonDown(0)
+            && GameManager.Instance.pageCollision)
+        {
+
+            GameManager.Instance.pageCollected = true;
+            GameManager.Instance.pageCollision = false;
+
+            if (GameManager.Instance.IsLastPage())
+                GameManager.Instance.lastPageCollected = true;
+
+            // using a coroutine to handle throtlling
+            StartCoroutine(KeyPressCooldown());
+        }
     }
 
     IEnumerator KeyPressCooldown() 

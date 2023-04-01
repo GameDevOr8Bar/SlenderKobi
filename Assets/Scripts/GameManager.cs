@@ -3,12 +3,12 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    private static GameManager instance;
     public static GameManager Instance { get; private set; }
 
     public bool pageCollected;
     public bool lastPageCollected;
     public bool gameOver;
+    public bool pageCollision;
     public int pageCounter;
 
     int lastPage = 8;
@@ -25,9 +25,16 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     TextMeshProUGUI pagesCollectedText;
 
+    [SerializeField]
+    Mesh[] pagesMeshes;
+
     int currentSpawnIndex;
     GameObject currentPage;
 
+    public bool IsLastPage()
+    {
+        return pageCounter == lastPage - 1;
+    }
     
 
    void Awake()
@@ -51,9 +58,8 @@ public class GameManager : MonoBehaviour
         currentSpawnIndex = 0;
 
         // Spawn the first Page
-        SpawnPage();
-
-        SetText();
+        SpawnPage(ref currentSpawnIndex, ref currentPage);
+        SetText(ref pagesCollectedText);
 
     }
 
@@ -67,18 +73,19 @@ public class GameManager : MonoBehaviour
         if (pageCollected)
         {            
             pageCounter += 1;
+       
+            DestroyCurrentPage();                          
+            SetText(ref pagesCollectedText);
 
-            if (pageCounter == lastPage)
-            {
-                lastPageCollected = true;
-                return;
-            }    
-
-            DestroyCurrentPage();
-            SpawnPage();                       
-            SetText();
+            if (!lastPageCollected)
+                SpawnPage(ref currentSpawnIndex, ref currentPage);            
 
             pageCollected = false;                                    
+        }
+
+        if (lastPageCollected)
+        {
+            pagesCollectedText.text = "Collcted All Pages";
         }
     }
 
@@ -102,9 +109,9 @@ public class GameManager : MonoBehaviour
         currentPage = null;
     }
 
-    void SpawnPage()
+    void SpawnPage(ref int currentSpawnIndex, ref GameObject currentPage)
     {
-       currentSpawnIndex = ChooseSpawnLocation();
+        currentSpawnIndex = ChooseSpawnLocation();
 
        if (currentSpawnIndex >= spawnLocations.Length || currentSpawnIndex < 0)
        {
@@ -112,11 +119,12 @@ public class GameManager : MonoBehaviour
        }
 
         currentPage = Instantiate(PagePrefab, spawnLocations[currentSpawnIndex].transform);
+        currentPage.GetComponent<MeshFilter>().mesh = pagesMeshes[pageCounter];
     }
 
-    void SetText()
+    void SetText(ref TextMeshProUGUI textObj)
     {
-        pagesCollectedText.text = "Pages Collected: " + pageCounter;
+        textObj.text = "Pages Collected: " + pageCounter;
     }
 
     void EndGame()
