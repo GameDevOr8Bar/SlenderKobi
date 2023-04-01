@@ -58,8 +58,8 @@ public class GameManager : MonoBehaviour
         currentSpawnIndex = 0;
 
         // Spawn the first Page
-        SpawnPage();
-        SetText();
+        SpawnPage(ref currentSpawnIndex, ref currentPage);
+        SetText(ref pagesCollectedText);
 
     }
 
@@ -75,11 +75,11 @@ public class GameManager : MonoBehaviour
             pageCounter += 1;
        
             DestroyCurrentPage();                          
-            SetText();
+            SetText(ref pagesCollectedText);
 
             if (!lastPageCollected)
-                SpawnPage();            
-            
+                SpawnPage(ref currentSpawnIndex, ref currentPage);            
+
             pageCollected = false;                                    
         }
 
@@ -109,7 +109,7 @@ public class GameManager : MonoBehaviour
         currentPage = null;
     }
 
-    void SpawnPage()
+    void SpawnPage(ref int currentSpawnIndex, ref GameObject currentPage)
     {
         currentSpawnIndex = ChooseSpawnLocation();
 
@@ -122,9 +122,9 @@ public class GameManager : MonoBehaviour
         currentPage.GetComponent<MeshFilter>().mesh = pagesMeshes[pageCounter];
     }
 
-    void SetText()
+    void SetText(ref TextMeshProUGUI textObj)
     {
-        pagesCollectedText.text = "Pages Collected: " + pageCounter;
+        textObj.text = "Pages Collected: " + pageCounter;
     }
 
     void EndGame()
