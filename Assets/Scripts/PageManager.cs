@@ -2,13 +2,19 @@ using UnityEngine;
 
 public class PageManager : MonoBehaviour
 {
+    const string PLAYER = "Player";
+
     void OnTriggerEnter(Collider other)
-    {
-        GameManager.Instance.pageCollision = true;
+    {   
+        Debug.Log("enter: " +  other.tag);
+        if (other.tag == PLAYER)
+            GameManager.Instance.pageCollision = true;
     }
 
     void OnTriggerExit(Collider other)
     {
-        GameManager.Instance.pageCollision = false;
+        Debug.Log("exit: " + other.tag);
+        if (other.tag == PLAYER)
+            GameManager.Instance.pageCollision = false;
     }
 }

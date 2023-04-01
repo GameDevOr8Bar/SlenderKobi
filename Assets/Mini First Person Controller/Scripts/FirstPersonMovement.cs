@@ -60,6 +60,7 @@ public class FirstPersonMovement : MonoBehaviour
         {
 
             GameManager.Instance.pageCollected = true;
+            GameManager.Instance.pageCollision = false;
 
             if (GameManager.Instance.IsLastPage())
                 GameManager.Instance.lastPageCollected = true;
