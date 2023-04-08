@@ -35,12 +35,6 @@ public class FenceManager : MonoBehaviour
         InstanciateFenceBorder(fenceAmount);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     int GetFenceAmount(float terrianLength, float fenceLength, int amountOffset)
     {
         return (int)((terrianLength / fenceLength) - amountOffset);
@@ -53,6 +47,8 @@ public class FenceManager : MonoBehaviour
 
     void InstanciateFenceBorder(int fenceAmount)
     {
+        Bounds bounds = new Bounds();        
+
         // ((X0 -> Xn), Y0, Z0)
         Vector3 minHor = new Vector3(terrainBounds.min.x + offset + (fenceSize.x / 2), 0, terrainBounds.min.z + offset);
         // ((X0 -> Xn), Y0, Zn)
@@ -62,6 +58,8 @@ public class FenceManager : MonoBehaviour
         Vector3 minVer = new Vector3(terrainBounds.min.x + offset, 0, terrainBounds.min.z + offset + (fenceSize.x / 2));
         // (Xn, Y0, (Z0 -> Zn))
         Vector3 maxVer = new Vector3(terrainBounds.max.x - offset, 0, terrainBounds.min.z + offset + (fenceSize.x / 2));
+
+        bounds.min = minHor;
 
 
         for (int i = 0; i < fenceAmount; i++)
@@ -77,6 +75,10 @@ public class FenceManager : MonoBehaviour
 
             minVer.z += fenceSize.x;
             maxVer.z += fenceSize.x;
-        }       
+        }
+
+        bounds.max = maxVer;
+
+        GameManager.Instance.SetFenceBounds(bounds);
     }
 }

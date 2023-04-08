@@ -17,18 +17,10 @@ public class FirstPersonMovement : MonoBehaviour
     public List<System.Func<float>> speedOverrides = new List<System.Func<float>>();
 
 
-    int cooldown = 2;
-    bool keyPressed = false;
-
     void Awake()
     {        
         // Get the rigidbody on this.
         rigidbody = GetComponent<Rigidbody>();
-    }
-
-    private void Update()
-    {   
-        HandlePageCollection();
     }
 
     void FixedUpdate()
@@ -48,32 +40,5 @@ public class FirstPersonMovement : MonoBehaviour
 
         // Apply movement.
         rigidbody.velocity = transform.rotation * new Vector3(targetVelocity.x, rigidbody.velocity.y, targetVelocity.y);
-    }
-
-    void HandlePageCollection()
-    {
-        // if the key is pressed, thortlling is over, 
-        // and player collided with the page, then collect page
-        if (!keyPressed
-            && Input.GetMouseButtonDown(0)
-            && GameManager.Instance.pageCollision)
-        {
-
-            GameManager.Instance.pageCollected = true;
-            GameManager.Instance.pageCollision = false;
-
-            if (GameManager.Instance.IsLastPage())
-                GameManager.Instance.lastPageCollected = true;
-
-            // using a coroutine to handle throtlling
-            StartCoroutine(KeyPressCooldown());
-        }
-    }
-
-    IEnumerator KeyPressCooldown() 
-    {
-        keyPressed = true;
-        yield return new WaitForSeconds(cooldown);
-        keyPressed = false;
-    }
+    }   
 }

@@ -11,7 +11,12 @@ public class GameManager : MonoBehaviour
     public bool pageCollision;
     public int pageCounter;
 
+    public Bounds fenceBounds;
+
     int lastPage = 8;
+
+    [SerializeField]
+    GameObject SlendermanPrefab;
 
     [SerializeField]
     GameObject PagePrefab;
@@ -60,20 +65,24 @@ public class GameManager : MonoBehaviour
         // Spawn the first Page
         SpawnPage(ref currentSpawnIndex, ref currentPage);
         SetText(ref pagesCollectedText);
-
     }
 
     void Update()
-    {  
+    {
         if (gameOver)
         {
             EndGame();
         }
 
         if (pageCollected)
-        {            
+        {
+            if (pageCounter == 0)
+            {
+                InstanciateSlenderMan();
+            }
+
             pageCounter += 1;
-       
+
             DestroyCurrentPage();                          
             SetText(ref pagesCollectedText);
 
@@ -127,9 +136,24 @@ public class GameManager : MonoBehaviour
         textObj.text = "Pages Collected: " + pageCounter;
     }
 
+    void InstanciateSlenderMan()
+    {
+        Instantiate(SlendermanPrefab, Vector3.zero, Quaternion.identity);
+    }    
+
     void EndGame()
     {
         // add end game logic
         return;
+    }
+
+    public void SetFenceBounds(Bounds bounds)
+    {
+        fenceBounds = bounds;
+    }
+
+    public bool InFenceBounds(Vector3 pos)
+    {
+        return fenceBounds.Contains(new Vector3(pos.x, fenceBounds.center.y, pos.z));
     }
 }
