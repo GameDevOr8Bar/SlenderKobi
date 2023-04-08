@@ -32,7 +32,7 @@ public class FenceManager : MonoBehaviour
 
         offset = GetOffset(terrianSize.x, fenceAmount, fenceSize.x);
 
-        InstanciateFenceBorder(fenceAmount);
+        InstantiateFenceBorder(fenceAmount);
     }
 
     int GetFenceAmount(float terrianLength, float fenceLength, int amountOffset)
@@ -45,7 +45,7 @@ public class FenceManager : MonoBehaviour
         return (terrianLength - (fenceAmount * fenceLength)) / 2;
     }
 
-    void InstanciateFenceBorder(int fenceAmount)
+    void InstantiateFenceBorder(int fenceAmount)
     {
         Bounds bounds = new Bounds();        
 

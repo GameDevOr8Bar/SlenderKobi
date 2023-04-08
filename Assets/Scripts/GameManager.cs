@@ -78,7 +78,7 @@ public class GameManager : MonoBehaviour
         {
             if (pageCounter == 0)
             {
-                InstanciateSlenderMan();
+                InstantiateSlenderMan();
             }
 
             pageCounter += 1;
@@ -136,9 +136,9 @@ public class GameManager : MonoBehaviour
         textObj.text = "Pages Collected: " + pageCounter;
     }
 
-    void InstanciateSlenderMan()
+    void InstantiateSlenderMan()
     {
-        Instantiate(SlendermanPrefab, Vector3.zero, Quaternion.identity);
+        Instantiate(SlendermanPrefab, Vector3.zero, Quaternion.identity);        
     }    
 
     void EndGame()
