@@ -33,19 +33,15 @@ public class GameManager : MonoBehaviour
     Mesh[] pagesMeshes;
 
     int currentSpawnIndex;
-    GameObject currentPage;
+    GameObject currentPage;    
+    
 
-  
    void Awake()
     {
         if (Instance != null && Instance != this)
-        {
             Destroy(this);
-        }
         else
-        {
             Instance = this;
-        }
     }
 
     void Start()
@@ -63,17 +59,13 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (gameOver)
-        {
-            EndGame();
-        }
+        if (gameOver)       
+            EndGame();        
 
         if (pageCollected)
         {
-            if (pageCounter == 0)
-            {
-                InstantiateSlenderMan();
-            }
+            if (pageCounter == 0)            
+                InstantiateSlenderMan();            
 
             pageCounter += 1;
 
@@ -84,16 +76,17 @@ public class GameManager : MonoBehaviour
                 SpawnPage(ref currentSpawnIndex, ref currentPage);            
 
             pageCollected = false;                                    
-        }      
+        }
+
+        if (lastPageCollected)      
+            pagesCollectedText.text = "Collcted All Pages";        
     }
 
     int ChooseSpawnLocation()
     {
         int index = currentSpawnIndex;
-        while (index == currentSpawnIndex)
-        {
-            index = Random.Range(0, spawnLocations.Length);
-        }
+        while (index == currentSpawnIndex)       
+            index = Random.Range(0, spawnLocations.Length);        
 
         return index;
     }
@@ -102,8 +95,10 @@ public class GameManager : MonoBehaviour
     {
         if (currentPage == null)
             return;
+
         AudioSource audioSource = currentPage.GetComponentInParent<AudioSource>();
         audioSource.Play();
+
         Destroy(currentPage);
         currentPage = null;
     }
@@ -113,9 +108,7 @@ public class GameManager : MonoBehaviour
         currentSpawnIndex = ChooseSpawnLocation();
 
        if (currentSpawnIndex >= spawnLocations.Length || currentSpawnIndex < 0)
-       {
             currentSpawnIndex = 0;
-       }
 
         currentPage = Instantiate(PagePrefab, spawnLocations[currentSpawnIndex].transform);
         currentPage.GetComponent<MeshFilter>().mesh = pagesMeshes[pageCounter];
@@ -137,10 +130,16 @@ public class GameManager : MonoBehaviour
     void EndGame()
     {
         // add end game logic
+        Time.timeScale = 0;
         return;
     }
 
     public bool IsLastPage()
+    {
+        return pageCounter == lastPage - 1;
+    }
+
+    public void SetFenceBounds(Bounds bounds)
     {
         return pageCounter == lastPage - 1;
     }
