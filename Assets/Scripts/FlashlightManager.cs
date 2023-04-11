@@ -97,37 +97,58 @@ public class FlashlightManager : MonoBehaviour
     // Checks if the flashlight should start flickering
     void FlickerStartCheck()
     {
-        if (flashlightActive && !currFlickering)
+        if (currFlickering || !flashlightActive)
+            return;
+
+        // Calculates from the last time a flicker has occured
+        timeFromLastFlicker += Time.deltaTime;
+        // Flicker chance counter, when it reaches a second it selects whether the flashlight should flicker or not.
+        flickerCheck += Time.deltaTime;
+        if (flickerCheck >= 1f)
         {
-            // Calculates from the last time a flicker has occured
-            timeFromLastFlicker += Time.deltaTime;
-            // Flicker chance counter, when it reaches a second it selects whether the flashlight should flicker or not.
-            flickerCheck += Time.deltaTime;
-            if (flickerCheck >= 1f)
-            {
-                // The flickering status is dependant on the flickering proabability and the time that has passed from the last flickering.
-                currFlickering = Random.Range(1, 100) < flickeringProbability * Mathf.Log(timeFromLastFlicker, 1.2f);
-                flickerCheck = 0;
-            }
+            // The flickering status is dependant on the flickering proabability and the time that has passed from the last flickering.
+            currFlickering = Random.Range(1, 100) < flickeringProbability * Mathf.Log(timeFromLastFlicker, 1.2f);
+            flickerCheck = 0;
         }
     }
 
     // Controls the flickering duration
     void FlashlightFlickerControl()
     {
-        if (currFlickering)
+        if (!currFlickering)
+            return;
+
+        timeFromLastFlicker = 0;
+        // The chance for the flashlight to be on during a flicker depends on how much time has the game been active, the longer the less likely the flashlight to turn on.
+        flashlightActive = Random.Range(0, flashlightActiveTime) < 100;
+        currFlickeringTime += Time.deltaTime;
+        // Stop the flickering after the duration
+        if (currFlickeringTime >= flickeringTime)
         {
-            timeFromLastFlicker = 0;
-            // The chance for the flashlight to be on during a flicker depends on how much time has the game been active, the longer the less likely the flashlight to turn on.
-            flashlightActive = Random.Range(0, flashlightActiveTime) < 100;
-            currFlickeringTime += Time.deltaTime;
-            // Stop the flickering after the duration
-            if (currFlickeringTime >= flickeringTime)
-            {
-                currFlickeringTime = 0f;
-                currFlickering = false;
-                flashlightActive = true;
-            }
+            currFlickeringTime = 0f;
+            currFlickering = false;
+            flashlightActive = true;
+        }
+    }
+
+    // Calculate the time the flashlight is active
+    void FlashlightActiveCalc()
+    {
+        if (!flashlightActive)
+            return;
+        
+        flashlightActiveTime += Time.deltaTime * (1 + (pagesCollected / 16));
+        if (nearEnemy)
+        {
+            flashlightActiveTime += Time.deltaTime * (nearEnemyLightDamage - 1);
+        }
+        if (flashlightActiveTime < lightDurability)
+        {
+            lightIntensity = Mathf.Round((startLightIntensity - ((startLightIntensity - endLightIntensity) / (lightDurability - flashlightActiveTime))) * 10) / 10.0f;
+        }
+        else
+        {
+            flashlightDead = true;
         }
     }
 
@@ -171,22 +192,7 @@ public class FlashlightManager : MonoBehaviour
             FlashlightFlickerControl();
             lightSource.enabled = flashlightActive;
             // Count the time the flashlight is active TODO: check if this counts pause menu time
-            if (flashlightActive)
-            {
-                flashlightActiveTime += Time.deltaTime * (1 + (pagesCollected / 16));
-                if (nearEnemy)
-                {
-                    flashlightActiveTime += Time.deltaTime * (nearEnemyLightDamage - 1);
-                }
-                if (flashlightActiveTime < lightDurability)
-                {
-                    lightIntensity = Mathf.Round((startLightIntensity - ((startLightIntensity - endLightIntensity) / (lightDurability - flashlightActiveTime))) * 10) / 10.0f;
-                }
-                else
-                {
-                    flashlightDead = true;
-                }
-            }
+            FlashlightActiveCalc();
         }
         else
         {
