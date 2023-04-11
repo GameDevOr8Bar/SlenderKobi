@@ -6,6 +6,7 @@ public class Teleporter : MonoBehaviour
 
     public Transform player;     // the Object the player is controlling  
     public float distanceToPlayer = 5; // how close the enemy has to be to the player to play music
+    public float rotationSpeed = 5f;
 
     private bool nearPlayer = false; // use this to stop the teleporting if near the player
     //private float nextTeleport = 0.0f; // will keep track of when we to teleport next
@@ -32,7 +33,11 @@ public class Teleporter : MonoBehaviour
         if (!nearPlayer && (Time.time - lastSpawnTime) > GetSpawnRate())
             Spawn();
 
-        nearPlayer = Vector3.Distance(transform.position, player.position) <= distanceToPlayer;             
+        nearPlayer = Vector3.Distance(transform.position, player.position) <= distanceToPlayer;   
+        
+        // Always look at player
+        transform.LookAt(player.position);
+        transform.rotation = Quaternion.Slerp(transform.rotation, transform.rotation, rotationSpeed * Time.deltaTime);
     }
 
     int GetPageCounter()
