@@ -27,17 +27,10 @@ public class Teleporter : MonoBehaviour
     void Update()
     {
         if (GameManager.Instance.lastPageCollected)
-        {
             Destroy(gameObject);
-        }
 
-        if (!nearPlayer)
-        {
-            if (Time.time - lastSpawnTime > GetSpawnRate())
-            {
-                Spawn();
-            }
-        }
+        if (!nearPlayer && (Time.time - lastSpawnTime) > GetSpawnRate())
+            Spawn();
 
         nearPlayer = Vector3.Distance(transform.position, player.position) <= distanceToPlayer;             
     }
