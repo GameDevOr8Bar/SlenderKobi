@@ -6,6 +6,7 @@ public class Teleporter : MonoBehaviour
 
     public Transform player;     // the Object the player is controlling  
     public float distanceToPlayer = 5; // how close the enemy has to be to the player to play music
+    public float rotationSpeed = 5f;
 
     private bool nearPlayer = false; // use this to stop the teleporting if near the player
     //private float nextTeleport = 0.0f; // will keep track of when we to teleport next
@@ -27,19 +28,16 @@ public class Teleporter : MonoBehaviour
     void Update()
     {
         if (GameManager.Instance.lastPageCollected)
-        {
             Destroy(gameObject);
-        }
 
-        if (!nearPlayer)
-        {
-            if (Time.time - lastSpawnTime > GetSpawnRate())
-            {
-                Spawn();
-            }
-        }
+        if (!nearPlayer && (Time.time - lastSpawnTime) > GetSpawnRate())
+            Spawn();
 
-        nearPlayer = Vector3.Distance(transform.position, player.position) <= distanceToPlayer;             
+        nearPlayer = Vector3.Distance(transform.position, player.position) <= distanceToPlayer;   
+        
+        // Always look at player
+        transform.LookAt(player.position);
+        transform.rotation = Quaternion.Slerp(transform.rotation, transform.rotation, rotationSpeed * Time.deltaTime);
     }
 
     int GetPageCounter()
@@ -76,24 +74,14 @@ public class Teleporter : MonoBehaviour
     }
 
     Vector3 GetSpawnPosition()
-    {
-        Vector3 spawn = Vector3.zero, distance;
+    {        
         float angle;
-        bool inBounds = false;
 
-        while (!inBounds)
-        {
-            angle = Mathf.Sin(Time.time);
+        angle = Mathf.Sin(Time.time);
 
-            distance = new Vector3(GetSpawnRadius() * Mathf.Cos(angle), transform.position.y, GetSpawnRadius() * Mathf.Sin(angle));
-
-            spawn = distance + player.transform.position;
-
-            inBounds = GameManager.Instance.InFenceBounds(spawn);
-
-        }        
-
-        return spawn;
+        Vector3 distance = new Vector3(GetSpawnRadius() * Mathf.Cos(angle), transform.position.y, GetSpawnRadius() * Mathf.Sin(angle));
+        
+        return distance + player.transform.position;
     }
 
     void Spawn()
