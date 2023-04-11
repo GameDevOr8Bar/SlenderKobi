@@ -113,7 +113,8 @@ public class GameManager : MonoBehaviour
     {
         if (currentPage == null)
             return;
-
+        AudioSource audioSource = currentPage.GetComponentInParent<AudioSource>();
+        audioSource.Play();
         Destroy(currentPage);
         currentPage = null;
     }
