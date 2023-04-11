@@ -76,24 +76,14 @@ public class Teleporter : MonoBehaviour
     }
 
     Vector3 GetSpawnPosition()
-    {
-        Vector3 spawn = Vector3.zero, distance;
+    {        
         float angle;
-        bool inBounds = false;
 
-        while (!inBounds)
-        {
-            angle = Mathf.Sin(Time.time);
+        angle = Mathf.Sin(Time.time);
 
-            distance = new Vector3(GetSpawnRadius() * Mathf.Cos(angle), transform.position.y, GetSpawnRadius() * Mathf.Sin(angle));
-
-            spawn = distance + player.transform.position;
-
-            inBounds = GameManager.Instance.InFenceBounds(spawn);
-
-        }        
-
-        return spawn;
+        Vector3 distance = new Vector3(GetSpawnRadius() * Mathf.Cos(angle), transform.position.y, GetSpawnRadius() * Mathf.Sin(angle));
+        
+        return distance + player.transform.position;
     }
 
     void Spawn()

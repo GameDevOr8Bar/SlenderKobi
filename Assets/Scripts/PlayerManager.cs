@@ -12,7 +12,7 @@ public class PlayerManager : MonoBehaviour
     void Update()
     {
         HandlePageCollection();
-    }
+    }    
 
     void HandlePageCollection()
     {

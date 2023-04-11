@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,8 +11,6 @@ public class GameManager : MonoBehaviour
     public bool gameOver;
     public bool pageCollision;
     public int pageCounter;
-
-    public Bounds fenceBounds;
 
     int lastPage = 8;
 
@@ -36,12 +35,7 @@ public class GameManager : MonoBehaviour
     int currentSpawnIndex;
     GameObject currentPage;
 
-    public bool IsLastPage()
-    {
-        return pageCounter == lastPage - 1;
-    }
-    
-
+  
    void Awake()
     {
         if (Instance != null && Instance != this)
@@ -90,12 +84,7 @@ public class GameManager : MonoBehaviour
                 SpawnPage(ref currentSpawnIndex, ref currentPage);            
 
             pageCollected = false;                                    
-        }
-
-        if (lastPageCollected)
-        {
-            pagesCollectedText.text = "Collcted All Pages";
-        }
+        }      
     }
 
     int ChooseSpawnLocation()
@@ -133,7 +122,10 @@ public class GameManager : MonoBehaviour
 
     void SetText(ref TextMeshProUGUI textObj)
     {
-        textObj.text = "Pages Collected: " + pageCounter;
+        if (lastPageCollected)
+            pagesCollectedText.text = "Collcted All Pages";
+        else        
+            textObj.text = "Pages Collected: " + pageCounter;
     }
 
     void InstantiateSlenderMan()
@@ -147,13 +139,9 @@ public class GameManager : MonoBehaviour
         return;
     }
 
-    public void SetFenceBounds(Bounds bounds)
+    public bool IsLastPage()
     {
-        fenceBounds = bounds;
+        return pageCounter == lastPage - 1;
     }
 
-    public bool InFenceBounds(Vector3 pos)
-    {
-        return fenceBounds.Contains(new Vector3(pos.x, fenceBounds.center.y, pos.z));
-    }
 }
