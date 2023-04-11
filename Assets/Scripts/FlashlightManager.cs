@@ -8,8 +8,10 @@ public class FlashlightManager : MonoBehaviour
 
     // Affects properties
     public bool nearEnemy;
-    public int pagesCollected;
-    public float gameTimePassedInSeconds;
+    int pagesCollected;
+    float flashlightActiveTime;
+
+    const int secondsInMinute = 60;
 
     // How much is the flashlight more likely to flicker after a minute has passed, in percentage, every second
     const float minuteFlickeringProbability = 1.2f;
@@ -24,7 +26,11 @@ public class FlashlightManager : MonoBehaviour
     // How much each page increases flickering probability
     const float pageFlickeringProbability = 1f;
 
-    const int secondsInMinute = 60;
+    const float startLightIntensity = 2.4f;
+    const float endLightIntensity = 1f;
+    // Flashlight is enabled for 15 minutes of active time. Dies faster when with more pages or near enemy
+    const float lightDurability = 15 * secondsInMinute;
+    const float nearEnemyLightDamage = 1.5f;
 
     bool flashlightActive;
     // How likely is the flashlight to flicker
@@ -42,6 +48,7 @@ public class FlashlightManager : MonoBehaviour
 
     // The flashlight's flickering probability
     float lightIntensity;
+    bool flashlightDead;
 
     // Function to calculate the flickering probability
     float FlickeringProbability(float timeInSeconds, int pagesCollected, bool nearEnemy)
@@ -62,12 +69,87 @@ public class FlashlightManager : MonoBehaviour
     float FlickeringDuration(float timeInSeconds, bool nearEnemy)
     {
         float baseDuration = startingFlickeringDuration;
-        baseDuration += gameTimePassedInSeconds / secondsInMinute * minuteFlickerDuration;
+        baseDuration += flashlightActiveTime / secondsInMinute * minuteFlickerDuration;
         if (nearEnemy)
         {
             baseDuration += enemyNearFlickeringDuration;
         }
         return baseDuration;
+    }
+
+    // Controls the flashlight by the mouse right button
+    void FlashlightControl()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            flashlightActive = !flashlightActive;
+            // When enabling/disabling the flashlight, the flicker counter resets
+            timeFromLastFlicker = 0;
+            // If the flashlight was flickering, disabling it resets its status (allows the player to turn off, turn on the light for the flashlight to work correctly for a while)
+            if (currFlickering)
+            {
+                flashlightActive = false;
+                currFlickering = false;
+            }
+        }
+    }
+
+    // Checks if the flashlight should start flickering
+    void FlickerStartCheck()
+    {
+        if (currFlickering || !flashlightActive)
+            return;
+
+        // Calculates from the last time a flicker has occured
+        timeFromLastFlicker += Time.deltaTime;
+        // Flicker chance counter, when it reaches a second it selects whether the flashlight should flicker or not.
+        flickerCheck += Time.deltaTime;
+        if (flickerCheck >= 1f)
+        {
+            // The flickering status is dependant on the flickering proabability and the time that has passed from the last flickering.
+            currFlickering = Random.Range(1, 100) < flickeringProbability * Mathf.Log(timeFromLastFlicker, 1.2f);
+            flickerCheck = 0;
+        }
+    }
+
+    // Controls the flickering duration
+    void FlashlightFlickerControl()
+    {
+        if (!currFlickering)
+            return;
+
+        timeFromLastFlicker = 0;
+        // The chance for the flashlight to be on during a flicker depends on how much time has the game been active, the longer the less likely the flashlight to turn on.
+        flashlightActive = Random.Range(0, flashlightActiveTime) < 100;
+        currFlickeringTime += Time.deltaTime;
+        // Stop the flickering after the duration
+        if (currFlickeringTime >= flickeringTime)
+        {
+            currFlickeringTime = 0f;
+            currFlickering = false;
+            flashlightActive = true;
+        }
+    }
+
+    // Calculate the time the flashlight is active
+    void FlashlightActiveCalc()
+    {
+        if (!flashlightActive)
+            return;
+        
+        flashlightActiveTime += Time.deltaTime * (1 + (pagesCollected / 16));
+        if (nearEnemy)
+        {
+            flashlightActiveTime += Time.deltaTime * (nearEnemyLightDamage - 1);
+        }
+        if (flashlightActiveTime < lightDurability)
+        {
+            lightIntensity = Mathf.Round((startLightIntensity - ((startLightIntensity - endLightIntensity) / (lightDurability - flashlightActiveTime))) * 10) / 10.0f;
+        }
+        else
+        {
+            flashlightDead = true;
+        }
     }
 
     void Awake()
@@ -84,6 +166,8 @@ public class FlashlightManager : MonoBehaviour
         currFlickering = false;
         currFlickeringTime = 0;
         flickeringTime = startingFlickeringDuration;
+        lightIntensity = startLightIntensity;
+        flashlightDead = false;
     }
 
     // Update is called once per frame
@@ -94,51 +178,25 @@ public class FlashlightManager : MonoBehaviour
         //      Is the player near an enemy: when the player is near an enemy, increases the flicker chance by a large amount
         //      How many pages have been collected: each page increases flicker probability by a small amount
         pagesCollected = GameManager.Instance.pageCounter;
-        flickeringProbability = FlickeringProbability(gameTimePassedInSeconds, pagesCollected, nearEnemy);
-        // Update flickering max duration. Affected by the same variables as the probability.
-        flickeringTime = FlickeringDuration(gameTimePassedInSeconds, nearEnemy);
-        // Enables/disables the flashlight. If flashlight is flickering, stop it.
-        if (Input.GetMouseButtonDown(1))
+        //lightSource.intensity = lightIntensity;
+        if (!flashlightDead)
         {
-            flashlightActive = !flashlightActive;
-            // When enabling/disabling the flashlight, the flicker counter resets
-            timeFromLastFlicker = 0;
-            // If the flashlight was flickering, disabling it resets its status (allows the player to turn off, turn on the light for the flashlight to work correctly for a while)
-            if (currFlickering)
-            {
-                flashlightActive = false;
-                currFlickering = false;
-            }
+            flickeringProbability = FlickeringProbability(flashlightActiveTime, pagesCollected, nearEnemy);
+            // Update flickering max duration. Affected by the same variables as the probability.
+            flickeringTime = FlickeringDuration(flashlightActiveTime, nearEnemy);
+            // Enables/disables the flashlight. If flashlight is flickering, stop it.
+            FlashlightControl();
+            // While flashlight is not flickering, randomize if it should
+            FlickerStartCheck();
+            // Handle current flickering
+            FlashlightFlickerControl();
+            lightSource.enabled = flashlightActive;
+            // Count the time the flashlight is active TODO: check if this counts pause menu time
+            FlashlightActiveCalc();
         }
-        // While flashlight is not flickering, randomize if it should
-        if (flashlightActive && !currFlickering)
+        else
         {
-            // Calculates from the last time a flicker has occured
-            timeFromLastFlicker += Time.deltaTime;
-            // Flicker chance counter, when it reaches a second it selects whether the flashlight should flicker or not.
-            flickerCheck += Time.deltaTime;
-            if (flickerCheck >= 1f)
-            {
-                // The flickering status is dependant on the flickering proabability and the time that has passed from the last flickering.
-                currFlickering = Random.Range(1, 100) < flickeringProbability * Mathf.Log(timeFromLastFlicker, 1.2f);
-                flickerCheck = 0;
-            }
+            lightSource.enabled = false;
         }
-        // Handle current flickering
-        if (currFlickering)
-        {
-            timeFromLastFlicker = 0;
-            // The chance for the flashlight to be on during a flicker depends on how much time has the game been active, the longer the less likely the flashlight to turn on.
-            flashlightActive = Random.Range(0, gameTimePassedInSeconds) < 100;
-            currFlickeringTime += Time.deltaTime;
-            // Stop the flickering after the duration
-            if (currFlickeringTime >= flickeringTime)
-            {
-                currFlickeringTime = 0f;
-                currFlickering = false;
-                flashlightActive = true;
-            }
-        }
-        lightSource.enabled = flashlightActive;
     }
 }
